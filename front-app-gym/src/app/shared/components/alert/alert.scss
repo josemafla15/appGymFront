@@ -1,0 +1,44 @@
+.alert {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  
+  .alert-icon {
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+  }
+  
+  .alert-message {
+    flex: 1;
+  }
+  
+  .alert-close {
+    margin-left: 0.5rem;
+  }
+  
+  &.alert-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #81c784;
+  }
+  
+  &.alert-error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef5350;
+  }
+  
+  &.alert-warning {
+    background-color: #fff3e0;
+    color: #ef6c00;
+    border: 1px solid #ffb74d;
+  }
+  
+  &.alert-info {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #64b5f6;
+  }
+}

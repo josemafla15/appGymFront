@@ -1,0 +1,45 @@
+<div class="dashboard">
+  <h1>Dashboard</h1>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <app-alert *ngIf="error" type="warning" [message]="error"></app-alert>
+
+  <div *ngIf="!loading && assignment" class="dashboard-content">
+    <div class="stats-grid">
+      <mat-card>
+        <mat-card-content>
+          <h3>Total Workouts</h3>
+          <p class="stat-value">{{ stats?.total_workouts || 0 }}</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-content>
+          <h3>Completed</h3>
+          <p class="stat-value">{{ stats?.completed_workouts || 0 }}</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-content>
+          <h3>Completion Rate</h3>
+          <p class="stat-value">{{ stats?.completion_rate || 0 }}%</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card class="assignment-card">
+      <mat-card-header>
+        <mat-card-title>Current Program</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2>{{ assignment.week_template.name }}</h2>
+        <p>{{ assignment.week_template.description }}</p>
+        <button mat-raised-button color="primary" routerLink="/user/my-workouts">
+          View Workouts
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
