@@ -1,0 +1,38 @@
+.exercise-form {
+  .page-header {
+    margin-bottom: 2rem;
+
+    h1 {
+      margin: 0 0 0.5rem 0;
+    }
+
+    p {
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  mat-card-content {
+    form {
+      max-width: 600px;
+
+      .full-width {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e0e0e0;
+
+        button[type="submit"] {
+          min-width: 120px;
+        }
+      }
+    }
+  }
+}

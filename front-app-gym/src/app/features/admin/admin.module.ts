@@ -6,10 +6,18 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { AdminLayout } from './components/admin-layout/admin-layout';
 import { Sidebar } from './components/sidebar/sidebar';
 
+// Pages
+import { AdminDashboardComponent } from './pages/dashboard/dashboard.component';
+import { ExerciseListComponent } from './pages/exercises/exercise-list/exercise-list.component';
+import { ExerciseFormComponent } from './pages/exercises/exercise-form/exercise-form.component';
+
 @NgModule({
   declarations: [
     AdminLayout,
-    Sidebar
+    Sidebar,
+    AdminDashboardComponent,
+    ExerciseListComponent,
+    ExerciseFormComponent
   ],
   imports: [
     SharedModule,

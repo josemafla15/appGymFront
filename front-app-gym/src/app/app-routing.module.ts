@@ -5,7 +5,7 @@ import { AuthGuard, AdminGuard, GuestGuard } from './core/guards';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: '/user/dashboard',
+    redirectTo: '/auth/login',  // CAMBIA ESTO - va directo al login
     pathMatch: 'full'
   },
   {
@@ -25,7 +25,7 @@ const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '/user/dashboard'
+    redirectTo: '/auth/login'  // Y ESTO también
   }
 ];
 

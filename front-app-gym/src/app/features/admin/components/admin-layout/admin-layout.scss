@@ -1,8 +1,36 @@
 .admin-layout {
-  padding: 2rem;
-  
-  h1 {
-    color: #333;
-    margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  .spacer {
+    flex: 1;
   }
+}
+
+.admin-container {
+  flex: 1;
+  overflow: hidden;
+}
+
+.admin-sidenav {
+  width: 250px;
+  border-right: 1px solid #e0e0e0;
+}
+
+.admin-content {
+  background-color: #f5f5f5;
+  overflow-y: auto;
+}
+
+.content-wrapper {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }

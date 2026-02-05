@@ -1,0 +1,78 @@
+<div class="admin-dashboard">
+  <h1>Dashboard</h1>
+  <p class="subtitle">Welcome to the admin panel</p>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <div *ngIf="!loading" class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon exercises">
+          <mat-icon>fitness_center</mat-icon>
+        </div>
+        <h3>Total Exercises</h3>
+        <p class="stat-value">{{ stats.totalExercises }}</p>
+        <a mat-button color="primary" routerLink="/admin/exercises">
+          Manage Exercises
+        </a>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon workout-days">
+          <mat-icon>event</mat-icon>
+        </div>
+        <h3>Workout Days</h3>
+        <p class="stat-value">{{ stats.totalWorkoutDays }}</p>
+        <a mat-button color="primary" routerLink="/admin/workout-days">
+          Manage Days
+        </a>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon workout-weeks">
+          <mat-icon>calendar_today</mat-icon>
+        </div>
+        <h3>Workout Weeks</h3>
+        <p class="stat-value">{{ stats.totalWorkoutWeeks }}</p>
+        <a mat-button color="primary" routerLink="/admin/workout-weeks">
+          Manage Weeks
+        </a>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon users">
+          <mat-icon>people</mat-icon>
+        </div>
+        <h3>Users</h3>
+        <p class="stat-value">{{ stats.totalUsers }}</p>
+        <a mat-button color="primary" routerLink="/admin/users">
+          Manage Users
+        </a>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div *ngIf="!loading" class="quick-actions">
+    <h2>Quick Actions</h2>
+    <div class="actions-grid">
+      <button mat-raised-button color="primary" routerLink="/admin/exercises/new">
+        <mat-icon>add</mat-icon>
+        Create Exercise
+      </button>
+      <button mat-raised-button color="primary" routerLink="/admin/workout-days/new">
+        <mat-icon>add</mat-icon>
+        Create Workout Day
+      </button>
+      <button mat-raised-button color="primary" routerLink="/admin/workout-weeks/new">
+        <mat-icon>add</mat-icon>
+        Create Workout Week
+      </button>
+    </div>
+  </div>
+</div>

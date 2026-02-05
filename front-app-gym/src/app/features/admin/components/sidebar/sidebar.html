@@ -1,1 +1,43 @@
-<p>sidebar works!</p>
+<mat-nav-list class="sidebar-menu">
+  <h3 mat-subheader>Menu</h3>
+  
+  <a 
+    mat-list-item
+    [routerLink]="['/admin/dashboard']"
+    routerLinkActive="active">
+    <mat-icon matListItemIcon>dashboard</mat-icon>
+    <span matListItemTitle>Dashboard</span>
+  </a>
+
+  <a 
+    mat-list-item
+    [routerLink]="['/admin/exercises']"
+    routerLinkActive="active">
+    <mat-icon matListItemIcon>fitness_center</mat-icon>
+    <span matListItemTitle>Exercises</span>
+  </a>
+
+  <a 
+    mat-list-item
+    [routerLink]="['/admin/workout-days']"
+    routerLinkActive="active">
+    <mat-icon matListItemIcon>event</mat-icon>
+    <span matListItemTitle>Workout Days</span>
+  </a>
+
+  <a 
+    mat-list-item
+    [routerLink]="['/admin/workout-weeks']"
+    routerLinkActive="active">
+    <mat-icon matListItemIcon>calendar_today</mat-icon>
+    <span matListItemTitle>Workout Weeks</span>
+  </a>
+
+  <a 
+    mat-list-item
+    [routerLink]="['/admin/users']"
+    routerLinkActive="active">
+    <mat-icon matListItemIcon>people</mat-icon>
+    <span matListItemTitle>Users</span>
+  </a>
+</mat-nav-list>
