@@ -1,1 +1,9 @@
-<p>navbar works!</p>
+<nav class="navbar">
+  <div class="navbar-brand">
+    <h2>Gym Tracker</h2>
+  </div>
+  <div class="navbar-menu">
+    <a routerLink="/user/dashboard">Dashboard</a>
+    <a routerLink="/auth/login" (click)="onLogout()">Logout</a>
+  </div>
+</nav>

@@ -4,11 +4,11 @@ import { UserWeekAssignment, WorkoutStats } from '@core/models';
 
 @Component({
   selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
+  templateUrl: './dashboard.html',
+  styleUrls: ['./dashboard.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DashboardComponent implements OnInit {
+export class Dashboard implements OnInit {
   assignment: UserWeekAssignment | null = null;
   stats: WorkoutStats | null = null;
   loading = true;

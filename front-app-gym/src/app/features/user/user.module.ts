@@ -1,13 +1,20 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
+import { SharedModule } from '@shared/shared.module';
 import { UserRoutingModule } from './user-routing.module';
 
+// Components
+import { UserLayout } from './components/user-layout/user-layout';
+import { Navbar } from './components/navbar/navbar';
+import { Dashboard } from './pages/dashboard/dashboard';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    UserLayout,
+    Navbar,
+    Dashboard
+  ],
   imports: [
-    CommonModule,
+    SharedModule,
     UserRoutingModule
   ]
 })

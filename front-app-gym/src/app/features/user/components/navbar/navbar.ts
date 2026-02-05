@@ -1,11 +1,19 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '@core/services';
 
 @Component({
   selector: 'app-navbar',
-  imports: [],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.scss',
+  styleUrls: ['./navbar.scss']
 })
 export class Navbar {
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
+  onLogout(): void {
+    this.authService.logout();
+  }
 }

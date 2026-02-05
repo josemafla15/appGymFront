@@ -4,7 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app';
+import { AppComponent } from './app.component';
 
 // Interceptors
 import { JwtInterceptor, ErrorInterceptor } from './core/interceptors';
