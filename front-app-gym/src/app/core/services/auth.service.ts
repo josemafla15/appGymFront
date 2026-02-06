@@ -52,12 +52,22 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.API_URL}/login/`, credentials).pipe(
       tap(response => {
+        console.log('Login response:', response); // DEBUG
+        
         this.setTokens(response.access, response.refresh);
         this.isAuthenticatedSubject.next(true);
         
-        this.getProfile().subscribe(user => {
-          this.currentUserSubject.next(user);
-        });
+        // Si el backend devuelve el usuario en la respuesta, usarlo directamente
+        if (response.user) {
+          console.log('User from login response:', response.user); // DEBUG
+          this.currentUserSubject.next(response.user);
+        } else {
+          // Si no, hacer una llamada adicional para obtener el perfil
+          this.getProfile().subscribe(user => {
+            console.log('User from profile:', user); // DEBUG
+            this.currentUserSubject.next(user);
+          });
+        }
       })
     );
   }
@@ -125,7 +135,11 @@ export class AuthService {
   }
 
   isAdmin(): boolean {
-    return this.currentUserValue?.role === UserRole.ADMIN;
+    const user = this.currentUserValue;
+    console.log('isAdmin check - Current user:', user); // DEBUG
+    const isAdmin = user?.role === UserRole.ADMIN;
+    console.log('isAdmin result:', isAdmin); // DEBUG
+    return isAdmin;
   }
 
   isAuthenticated(): boolean {
