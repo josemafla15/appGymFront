@@ -1,0 +1,106 @@
+<div class="workout-week-form">
+  <div class="page-header">
+    <div>
+      <h1>{{ isEditMode ? 'Edit Workout Week' : 'New Workout Week' }}</h1>
+      <p>{{ isEditMode ? 'Update workout week details' : 'Create a new weekly program' }}</p>
+    </div>
+  </div>
+
+  <mat-card>
+    <mat-card-content>
+      <app-alert 
+        *ngIf="errorMessage" 
+        type="error" 
+        [message]="errorMessage"
+        (dismiss)="errorMessage = ''">
+      </app-alert>
+
+      <app-loading-spinner *ngIf="loading && isEditMode"></app-loading-spinner>
+
+      <form [formGroup]="workoutWeekForm" (ngSubmit)="onSubmit()" *ngIf="!loading || !isEditMode">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g., 5-Day Split Program">
+          <mat-error *ngIf="workoutWeekForm.get('name')?.hasError('required')">
+            Name is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description (optional)</mat-label>
+          <textarea 
+            matInput 
+            formControlName="description" 
+            rows="4"
+            placeholder="Describe the weekly program..."></textarea>
+        </mat-form-field>
+
+        <!-- Days Section -->
+        <div class="days-section">
+          <div class="section-header">
+            <h3>Weekly Schedule</h3>
+            <button mat-raised-button color="accent" type="button" (click)="onAddDay()">
+              <mat-icon>add</mat-icon>
+              Add Day
+            </button>
+          </div>
+
+          <div *ngIf="daysArray.length === 0" class="no-days">
+            <mat-icon>calendar_today</mat-icon>
+            <p>No days scheduled yet</p>
+            <button mat-raised-button color="primary" type="button" (click)="onAddDay()">
+              Add First Day
+            </button>
+          </div>
+
+          <div *ngIf="daysArray.length > 0" formArrayName="days" class="days-list">
+            <mat-card *ngFor="let day of daysArray.controls; let i = index" [formGroupName]="i" class="day-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <span class="day-number">Day {{ i + 1 }}</span>
+                  <button mat-icon-button color="warn" type="button" (click)="onRemoveDay(i)" matTooltip="Remove">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </mat-card-title>
+              </mat-card-header>
+              
+              <mat-card-content>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Workout Day</mat-label>
+                  <mat-select formControlName="workout_day_id">
+                    <mat-option *ngFor="let workoutDay of availableWorkoutDays" [value]="workoutDay.id">
+                      {{ workoutDay.name }} ({{ workoutDay.type | workoutType }})
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>Workout day is required</mat-error>
+                </mat-form-field>
+
+                <div *ngIf="day.get('workout_day_id')?.value" class="day-info">
+                  <mat-chip>{{ getWorkoutDayType(day.get('workout_day_id')?.value) }}</mat-chip>
+                  <span class="exercise-count">
+                    {{ getExerciseCount(day) }} exercises
+
+                  </span>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="onCancel()">
+            Cancel
+          </button>
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit"
+            [disabled]="workoutWeekForm.invalid || loading">
+            <span *ngIf="!loading">{{ isEditMode ? 'Update' : 'Create' }}</span>
+            <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

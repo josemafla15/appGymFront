@@ -1,0 +1,122 @@
+.workout-week-form {
+  .page-header {
+    margin-bottom: 2rem;
+
+    h1 {
+      margin: 0 0 0.5rem 0;
+    }
+
+    p {
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  mat-card-content {
+    form {
+      max-width: 900px;
+
+      .full-width {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      .days-section {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+
+          h3 {
+            margin: 0;
+            color: #333;
+          }
+
+          button {
+            mat-icon {
+              margin-right: 0.5rem;
+            }
+          }
+        }
+
+        .no-days {
+          text-align: center;
+          padding: 2rem;
+          color: #999;
+
+          mat-icon {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+          }
+
+          p {
+            margin-bottom: 1rem;
+          }
+        }
+
+        .days-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 1rem;
+
+          .day-card {
+            background-color: white;
+
+            mat-card-header {
+              mat-card-title {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+
+                .day-number {
+                  font-weight: 600;
+                  color: #1976d2;
+                }
+              }
+            }
+
+            mat-card-content {
+              .day-info {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-top: 0.5rem;
+
+                mat-chip {
+                  font-size: 0.75rem;
+                }
+
+                .exercise-count {
+                  color: #666;
+                  font-size: 0.9rem;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e0e0e0;
+
+        button[type="submit"] {
+          min-width: 120px;
+        }
+      }
+    }
+  }
+}

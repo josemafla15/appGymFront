@@ -1,0 +1,68 @@
+.workout-week-list {
+.page-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+margin-bottom: 2rem;
+h1 {
+  margin: 0 0 0.5rem 0;
+}
+
+p {
+  color: #666;
+  margin: 0;
+}
+
+button {
+  mat-icon {
+    margin-right: 0.5rem;
+  }
+}
+}
+.filters {
+display: flex;
+gap: 1rem;
+margin-bottom: 1.5rem;
+.search-field {
+  flex: 1;
+  max-width: 600px;
+}
+}
+.no-data {
+text-align: center;
+padding: 3rem;
+color: #999;
+mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+}
+
+p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+}
+.workout-weeks-table {
+width: 100%;
+.description-text {
+  color: #666;
+  font-size: 0.9rem;
+  display: block;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions-column {
+  width: 120px;
+  text-align: right;
+}
+
+mat-chip {
+  font-size: 0.75rem;
+}
+}
+}

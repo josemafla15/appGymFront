@@ -1,9 +1,19 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { 
+  Component, 
+  OnInit, 
+  ChangeDetectionStrategy, 
+  ChangeDetectorRef, 
+  ViewChild, 
+  AfterViewInit 
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { ExerciseService } from '@core/services';
 import { ExerciseList, MuscleGroup } from '@core/models';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '@shared/components/confirm-dialog/confirm-dialog';
+
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-exercise-list',
@@ -11,15 +21,20 @@ import { ConfirmDialogComponent } from '@shared/components/confirm-dialog/confir
   styleUrls: ['./exercise-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ExerciseListComponent implements OnInit {
+export class ExerciseListComponent implements OnInit, AfterViewInit {
+
   exercises: ExerciseList[] = [];
   filteredExercises: ExerciseList[] = [];
+
+  dataSource = new MatTableDataSource<ExerciseList>();
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
   loading = true;
   searchTerm = '';
   selectedMuscleGroup: MuscleGroup | '' = '';
 
   displayedColumns: string[] = ['name', 'muscle_group', 'actions'];
-
   muscleGroups = Object.values(MuscleGroup);
 
   constructor(
@@ -29,9 +44,18 @@ export class ExerciseListComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
+  // ================= INIT =================
+
   ngOnInit(): void {
     this.loadExercises();
   }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.paginator.pageSize = 20;
+  }
+
+  // ================= LOAD =================
 
   loadExercises(): void {
     this.loading = true;
@@ -41,6 +65,9 @@ export class ExerciseListComponent implements OnInit {
       next: (exercises) => {
         this.exercises = exercises;
         this.filteredExercises = exercises;
+
+        this.dataSource.data = exercises;
+
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -50,6 +77,8 @@ export class ExerciseListComponent implements OnInit {
       }
     });
   }
+
+  // ================= FILTERS =================
 
   applyFilters(): void {
     let filtered = [...this.exercises];
@@ -61,10 +90,19 @@ export class ExerciseListComponent implements OnInit {
     }
 
     if (this.selectedMuscleGroup) {
-      filtered = filtered.filter(ex => ex.muscle_group === this.selectedMuscleGroup);
+      filtered = filtered.filter(
+        ex => ex.muscle_group === this.selectedMuscleGroup
+      );
     }
 
     this.filteredExercises = filtered;
+    this.dataSource.data = filtered;
+
+    // Resetear a primera página al filtrar
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+
     this.cdr.markForCheck();
   }
 
@@ -76,6 +114,8 @@ export class ExerciseListComponent implements OnInit {
   onMuscleGroupChange(): void {
     this.applyFilters();
   }
+
+  // ================= ACTIONS =================
 
   onEdit(id: number): void {
     this.router.navigate(['/admin/exercises/edit', id]);
@@ -95,9 +135,7 @@ export class ExerciseListComponent implements OnInit {
     dialogRef.afterClosed().subscribe(confirmed => {
       if (confirmed) {
         this.exerciseService.deleteExercise(exercise.id).subscribe({
-          next: () => {
-            this.loadExercises();
-          }
+          next: () => this.loadExercises()
         });
       }
     });

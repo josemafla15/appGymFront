@@ -1,0 +1,63 @@
+<div class="my-workouts">
+  <div class="page-header">
+    <h1>My Workouts</h1>
+    <p>Your weekly training program</p>
+  </div>
+<app-loading-spinner *ngIf="loading"></app-loading-spinner>
+<app-alert *ngIf="error" type="warning" [message]="error"></app-alert>
+  <div *ngIf="!loading && !error && assignment" class="workouts-content">
+    <!-- Program Info -->
+    <mat-card class="program-info">
+      <mat-card-header>
+        <mat-card-title>{{ assignment.week_template.name }}</mat-card-title>
+        <mat-card-subtitle>{{ assignment.week_template.description }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-row">
+          <mat-icon>event</mat-icon>
+          <span>Started: {{ assignment.start_date | date:'mediumDate' }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+<!-- Workout Days -->
+<div class="workout-days">
+  <h2>Weekly Schedule</h2>
+  <div class="days-grid">
+    <mat-card *ngFor="let day of assignment.week_template.days" class="day-card">
+      <mat-card-header>
+        <mat-card-title>
+          <div class="day-header">
+            <span class="day-label">{{ getDayLabel(day.day_order) }}</span>
+            <mat-chip>Day {{ day.day_order }}</mat-chip>
+          </div>
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <h3>{{ day.workout_day.name }}</h3>
+        <mat-chip color="primary">{{ day.workout_day.type | workoutType }}</mat-chip>
+        
+        <div class="exercises-preview">
+          <h4>Exercises ({{ day.workout_day.exercises?.length || 0 }})</h4>
+          <ul *ngIf="day.workout_day.exercises && day.workout_day.exercises.length > 0">
+            <li *ngFor="let ex of day.workout_day.exercises.slice(0, 3)">
+              {{ ex.exercise.name }} - {{ ex.number_of_sets }} sets
+            </li>
+            <li *ngIf="day.workout_day.exercises.length > 3" class="more">
+              +{{ day.workout_day.exercises.length - 3 }} more...
+            </li>
+          </ul>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="onStartWorkout(day)">
+          <mat-icon>play_arrow</mat-icon>
+          Start Workout
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
+  </div>
+</div>

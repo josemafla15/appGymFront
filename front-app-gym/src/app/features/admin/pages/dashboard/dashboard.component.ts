@@ -1,6 +1,13 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { ExerciseService, WorkoutService } from '@core/services';
+import { WorkoutService, ExerciseService, UserService } from '@core/services';
 import { forkJoin } from 'rxjs';
+
+interface DashboardStats {
+  totalExercises: number;
+  totalWorkoutDays: number;
+  totalWorkoutWeeks: number;
+  totalUsers: number;
+}
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -9,17 +16,19 @@ import { forkJoin } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminDashboardComponent implements OnInit {
-  loading = true;
-  stats = {
+  stats: DashboardStats = {
     totalExercises: 0,
     totalWorkoutDays: 0,
     totalWorkoutWeeks: 0,
     totalUsers: 0
   };
 
+  loading = true;
+
   constructor(
-    private exerciseService: ExerciseService,
     private workoutService: WorkoutService,
+    private exerciseService: ExerciseService,
+    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -31,19 +40,25 @@ export class AdminDashboardComponent implements OnInit {
     this.loading = true;
     this.cdr.markForCheck();
 
+    // Cargar todas las estadísticas en paralelo
     forkJoin({
       exercises: this.exerciseService.getExercises(),
       workoutDays: this.workoutService.getWorkoutDays(),
-      workoutWeeks: this.workoutService.getWorkoutWeeks()
+      workoutWeeks: this.workoutService.getWorkoutWeeks(),
+      users: this.userService.getUsers()
     }).subscribe({
-      next: (data) => {
-        this.stats.totalExercises = data.exercises.length;
-        this.stats.totalWorkoutDays = data.workoutDays.length;
-        this.stats.totalWorkoutWeeks = data.workoutWeeks.length;
+      next: (results) => {
+        this.stats = {
+          totalExercises: results.exercises.length,
+          totalWorkoutDays: results.workoutDays.length,
+          totalWorkoutWeeks: results.workoutWeeks.length,
+          totalUsers: results.users.length
+        };
         this.loading = false;
         this.cdr.markForCheck();
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error loading dashboard stats:', err);
         this.loading = false;
         this.cdr.markForCheck();
       }

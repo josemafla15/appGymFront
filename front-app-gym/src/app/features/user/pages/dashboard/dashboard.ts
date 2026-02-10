@@ -8,7 +8,7 @@ import { UserWeekAssignment, WorkoutStats } from '@core/models';
   styleUrls: ['./dashboard.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Dashboard implements OnInit {
+export class DashboardComponent implements OnInit {
   assignment: UserWeekAssignment | null = null;
   stats: WorkoutStats | null = null;
   loading = true;
@@ -28,6 +28,7 @@ export class Dashboard implements OnInit {
     this.loading = true;
     this.cdr.markForCheck();
 
+    // Cargar asignación
     this.assignmentService.getMyAssignment().subscribe({
       next: (assignment) => {
         this.assignment = assignment;
@@ -35,12 +36,13 @@ export class Dashboard implements OnInit {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.error = 'No workout assigned yet';
+        this.error = 'No workout program assigned yet. Please contact your trainer.';
         this.loading = false;
         this.cdr.markForCheck();
       }
     });
 
+    // Cargar estadísticas
     this.trackingService.getWorkoutStats().subscribe({
       next: (stats) => {
         this.stats = stats;

@@ -1,45 +1,107 @@
 <div class="dashboard">
-  <h1>Dashboard</h1>
+  <h1>My Dashboard</h1>
 
   <app-loading-spinner *ngIf="loading"></app-loading-spinner>
 
   <app-alert *ngIf="error" type="warning" [message]="error"></app-alert>
 
-  <div *ngIf="!loading && assignment" class="dashboard-content">
+  <div *ngIf="!loading && !error" class="dashboard-content">
+    <!-- Stats Cards -->
     <div class="stats-grid">
-      <mat-card>
+      <mat-card class="stat-card">
         <mat-card-content>
+          <div class="stat-icon workouts">
+            <mat-icon>fitness_center</mat-icon>
+          </div>
           <h3>Total Workouts</h3>
           <p class="stat-value">{{ stats?.total_workouts || 0 }}</p>
         </mat-card-content>
       </mat-card>
 
-      <mat-card>
+      <mat-card class="stat-card">
         <mat-card-content>
+          <div class="stat-icon completed">
+            <mat-icon>check_circle</mat-icon>
+          </div>
           <h3>Completed</h3>
           <p class="stat-value">{{ stats?.completed_workouts || 0 }}</p>
         </mat-card-content>
       </mat-card>
 
-      <mat-card>
+      <mat-card class="stat-card">
         <mat-card-content>
+          <div class="stat-icon rate">
+            <mat-icon>trending_up</mat-icon>
+          </div>
           <h3>Completion Rate</h3>
-          <p class="stat-value">{{ stats?.completion_rate || 0 }}%</p>
+          <p class="stat-value">{{ stats?.completion_rate || 0 | number:'1.0-1' }}%</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon sets">
+            <mat-icon>repeat</mat-icon>
+          </div>
+          <h3>Total Sets</h3>
+          <p class="stat-value">{{ stats?.total_sets || 0 }}</p>
         </mat-card-content>
       </mat-card>
     </div>
 
-    <mat-card class="assignment-card">
+    <!-- Current Program -->
+    <mat-card *ngIf="assignment" class="program-card">
       <mat-card-header>
-        <mat-card-title>Current Program</mat-card-title>
+        <mat-card-title>
+          <mat-icon>calendar_today</mat-icon>
+          Current Program
+        </mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <h2>{{ assignment.week_template.name }}</h2>
-        <p>{{ assignment.week_template.description }}</p>
-        <button mat-raised-button color="primary" routerLink="/user/my-workouts">
-          View Workouts
-        </button>
+        <p class="description">{{ assignment.week_template.description }}</p>
+        
+        <div class="program-meta">
+          <div class="meta-item">
+            <mat-icon>event</mat-icon>
+            <span>Started: {{ assignment.start_date | date:'mediumDate' }}</span>
+          </div>
+          <div class="meta-item">
+            <mat-icon>view_week</mat-icon>
+            <span>{{ assignment.week_template.days.length }} days per week</span>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" routerLink="/user/workouts">
+            <mat-icon>play_arrow</mat-icon>
+            Start Workout
+          </button>
+          <button mat-stroked-button routerLink="/user/progress">
+            <mat-icon>assessment</mat-icon>
+            View Progress
+          </button>
+        </div>
       </mat-card-content>
     </mat-card>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>Quick Actions</h2>
+      <div class="actions-grid">
+        <button mat-raised-button color="accent" routerLink="/user/workouts">
+          <mat-icon>fitness_center</mat-icon>
+          <span>My Workouts</span>
+        </button>
+        <button mat-raised-button routerLink="/user/history">
+          <mat-icon>history</mat-icon>
+          <span>Workout History</span>
+        </button>
+        <button mat-raised-button routerLink="/user/progress">
+          <mat-icon>show_chart</mat-icon>
+          <span>Progress</span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>

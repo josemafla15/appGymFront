@@ -1,0 +1,78 @@
+<div class="workout-week-list">
+  <div class="page-header">
+    <div>
+      <h1>Workout Weeks</h1>
+      <p>Manage your weekly workout programs</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="onCreate()">
+      <mat-icon>add</mat-icon>
+      New Workout Week
+    </button>
+  </div>
+  <mat-card>
+    <mat-card-content>
+      <div class="filters">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search</mat-label>
+          <input 
+            matInput 
+            placeholder="Search by name or description"
+            (input)="onSearch($event)">
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+      </div>
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <div *ngIf="!loading && filteredWorkoutWeeks.length === 0" class="no-data">
+    <mat-icon>inbox</mat-icon>
+    <p>No workout weeks found</p>
+    <button mat-raised-button color="primary" (click)="onCreate()">
+      Create First Workout Week
+    </button>
+  </div>
+
+  <table 
+    *ngIf="!loading && filteredWorkoutWeeks.length > 0" 
+    mat-table 
+    [dataSource]="filteredWorkoutWeeks"
+    class="workout-weeks-table">
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let week">
+        <strong>{{ week.name }}</strong>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef>Description</th>
+      <td mat-cell *matCellDef="let week">
+        <span class="description-text">{{ week.description || 'No description' }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="day_count">
+      <th mat-header-cell *matHeaderCellDef>Days</th>
+      <td mat-cell *matCellDef="let week">
+        <mat-chip>{{ week.day_count }} days</mat-chip>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="actions-column">Actions</th>
+      <td mat-cell *matCellDef="let week" class="actions-column">
+        <button mat-icon-button (click)="onEdit(week.id)" matTooltip="Edit">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="onDelete(week)" matTooltip="Delete">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</mat-card-content>
+  </mat-card>
+</div>

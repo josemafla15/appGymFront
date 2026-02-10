@@ -1,12 +1,12 @@
-<div class="exercise-list">
+<div class="workout-day-list">
   <div class="page-header">
     <div>
-      <h1>Exercises</h1>
-      <p>Manage your exercise library</p>
+      <h1>Workout Days</h1>
+      <p>Manage your workout day templates</p>
     </div>
     <button mat-raised-button color="primary" (click)="onCreate()">
       <mat-icon>add</mat-icon>
-      New Exercise
+      New Workout Day
     </button>
   </div>
 
@@ -23,11 +23,11 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Muscle Group</mat-label>
-          <mat-select [(ngModel)]="selectedMuscleGroup" (selectionChange)="onMuscleGroupChange()">
+          <mat-label>Workout Type</mat-label>
+          <mat-select [(ngModel)]="selectedType" (selectionChange)="onTypeChange()">
             <mat-option value="">All</mat-option>
-            <mat-option *ngFor="let group of muscleGroups" [value]="group">
-              {{ group | muscleGroup }}
+            <mat-option *ngFor="let type of workoutTypes" [value]="type">
+              {{ type | workoutType }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -35,40 +35,44 @@
 
       <app-loading-spinner *ngIf="loading"></app-loading-spinner>
 
-      <div *ngIf="!loading && filteredExercises.length === 0" class="no-data">
+      <div *ngIf="!loading && filteredWorkoutDays.length === 0" class="no-data">
         <mat-icon>inbox</mat-icon>
-        <p>No exercises found</p>
+        <p>No workout days found</p>
         <button mat-raised-button color="primary" (click)="onCreate()">
-          Create First Exercise
+          Create First Workout Day
         </button>
       </div>
 
       <table 
-        *ngIf="!loading && filteredExercises.length > 0" 
+        *ngIf="!loading && filteredWorkoutDays.length > 0" 
         mat-table 
-        [dataSource]="dataSource"
-
-        class="exercises-table">
+        [dataSource]="filteredWorkoutDays"
+        class="workout-days-table">
 
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Name</th>
-          <td mat-cell *matCellDef="let exercise">{{ exercise.name }}</td>
+          <td mat-cell *matCellDef="let workoutDay">{{ workoutDay.name }}</td>
         </ng-container>
 
-        <ng-container matColumnDef="muscle_group">
-          <th mat-header-cell *matHeaderCellDef>Muscle Group</th>
-          <td mat-cell *matCellDef="let exercise">
-            <mat-chip>{{ exercise.muscle_group | muscleGroup }}</mat-chip>
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let workoutDay">
+            <mat-chip>{{ workoutDay.type | workoutType }}</mat-chip>
           </td>
+        </ng-container>
+
+        <ng-container matColumnDef="exercise_count">
+          <th mat-header-cell *matHeaderCellDef>Exercises</th>
+          <td mat-cell *matCellDef="let workoutDay">{{ workoutDay.exercise_count }}</td>
         </ng-container>
 
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef class="actions-column">Actions</th>
-          <td mat-cell *matCellDef="let exercise" class="actions-column">
-            <button mat-icon-button (click)="onEdit(exercise.id)" matTooltip="Edit">
+          <td mat-cell *matCellDef="let workoutDay" class="actions-column">
+            <button mat-icon-button (click)="onEdit(workoutDay.id)" matTooltip="Edit">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button color="warn" (click)="onDelete(exercise)" matTooltip="Delete">
+            <button mat-icon-button color="warn" (click)="onDelete(workoutDay)" matTooltip="Delete">
               <mat-icon>delete</mat-icon>
             </button>
           </td>
@@ -77,12 +81,6 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
-      <mat-paginator 
-        [pageSize]="20"
-        [pageSizeOptions]="[10, 20, 50]"
-        showFirstLastButtons>
-      </mat-paginator>
-
     </mat-card-content>
   </mat-card>
 </div>

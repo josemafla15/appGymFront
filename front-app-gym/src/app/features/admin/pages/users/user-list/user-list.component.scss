@@ -1,0 +1,61 @@
+.user-list {
+.page-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+margin-bottom: 2rem;
+h1 {
+  margin: 0 0 0.5rem 0;
+}
+
+p {
+  color: #666;
+  margin: 0;
+}
+}
+.filters {
+display: flex;
+gap: 1rem;
+margin-bottom: 1.5rem;
+.search-field {
+  flex: 1;
+  max-width: 500px;
+}
+
+.filter-field {
+  min-width: 150px;
+}
+}
+.no-data {
+text-align: center;
+padding: 3rem;
+color: #999;
+mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+}
+
+p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+}
+.users-table {
+width: 100%;
+.actions-column {
+  width: 80px;
+  text-align: right;
+}
+
+mat-chip {
+  font-size: 0.75rem;
+
+  &.admin-chip {
+    background-color: #1976d2;
+    color: white;
+  }
+}
+}
+}
