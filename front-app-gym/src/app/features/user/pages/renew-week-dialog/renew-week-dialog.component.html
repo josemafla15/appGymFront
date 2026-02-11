@@ -1,0 +1,66 @@
+<h2 mat-dialog-title>Start New Week</h2>
+
+<mat-dialog-content>
+  <div class="dialog-info">
+    <mat-icon>info</mat-icon>
+    <div>
+      <p><strong>{{ data.programName }}</strong></p>
+      <p class="current-week">Current week: {{ getFormattedCurrentWeek() }}</p>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <form [formGroup]="renewForm" class="renew-form">
+    <div class="info-message">
+      <mat-icon>autorenew</mat-icon>
+      <p>You're about to start a new week with the same workout program.</p>
+    </div>
+
+    <mat-checkbox formControlName="useAutoDate" class="auto-checkbox">
+      Automatically start next Monday
+    </mat-checkbox>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Start Date</mat-label>
+      <input 
+        matInput 
+        [matDatepicker]="picker"
+        formControlName="startDate"
+        [min]="minDate"
+        [disabled]="renewForm.get('useAutoDate')?.value">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-hint *ngIf="renewForm.get('useAutoDate')?.value">
+        Will start on the next Monday
+      </mat-hint>
+      <mat-error *ngIf="renewForm.get('startDate')?.hasError('required')">
+        Start date is required
+      </mat-error>
+    </mat-form-field>
+
+    <div class="summary">
+      <mat-icon>check_circle</mat-icon>
+      <div>
+        <p><strong>Summary:</strong></p>
+        <ul>
+          <li>Program: {{ data.programName }}</li>
+          <li>Days per week: {{ data.currentWeek.total_days }}</li>
+          <li>Your progress will continue tracking</li>
+        </ul>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button 
+    mat-raised-button 
+    color="primary" 
+    (click)="onConfirm()" 
+    [disabled]="renewForm.invalid">
+    <mat-icon>autorenew</mat-icon>
+    Start New Week
+  </button>
+</mat-dialog-actions>

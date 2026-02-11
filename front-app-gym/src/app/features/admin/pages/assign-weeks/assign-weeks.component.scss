@@ -1,0 +1,263 @@
+.assign-weeks {
+  .header {
+    margin-bottom: 2rem;
+
+    h1 {
+      margin: 0 0 0.5rem 0;
+      color: #333;
+    }
+
+    .subtitle {
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+
+    .users-card {
+      .users-table {
+        width: 100%;
+
+        th {
+          background-color: #f5f5f5;
+          font-weight: 600;
+        }
+
+        .assignment-cell {
+          .assigned-chip {
+            background-color: #43a047;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+
+          .no-assignment {
+            color: #999;
+            font-style: italic;
+          }
+        }
+
+        .selected-row {
+          background-color: #e3f2fd;
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #999;
+
+        mat-icon {
+          font-size: 64px;
+          width: 64px;
+          height: 64px;
+          margin-bottom: 1rem;
+        }
+      }
+    }
+
+    .assignment-form-card {
+      mat-card-header {
+        mat-card-title {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+      }
+
+      mat-card-content {
+        .user-info {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          padding: 1rem;
+          background-color: #e3f2fd;
+          border-radius: 4px;
+          margin-bottom: 1.5rem;
+
+          mat-icon {
+            color: #1976d2;
+            font-size: 32px;
+            width: 32px;
+            height: 32px;
+          }
+
+          strong {
+            display: block;
+            color: #1976d2;
+            font-size: 1.1rem;
+          }
+
+          p {
+            margin: 0.25rem 0 0 0;
+            color: #666;
+          }
+        }
+
+        mat-divider {
+          margin: 1.5rem 0;
+        }
+
+        .current-assignment-info {
+          display: flex;
+          gap: 1rem;
+          padding: 1rem;
+          background-color: #fff3e0;
+          border-radius: 4px;
+          margin-bottom: 1.5rem;
+
+          > mat-icon {
+            color: #f57c00;
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+          }
+
+          strong {
+            display: block;
+            margin-bottom: 0.5rem;
+          }
+
+          p {
+            margin: 0.25rem 0;
+            color: #666;
+          }
+
+          .warning-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #e65100;
+            font-weight: 500;
+            margin-top: 0.75rem;
+
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+
+        .full-width {
+          width: 100%;
+          margin-bottom: 1.5rem;
+        }
+
+        .template-preview {
+          background-color: #f5f5f5;
+          padding: 1.5rem;
+          border-radius: 4px;
+          margin-bottom: 1.5rem;
+
+          h4 {
+            margin: 0 0 1rem 0;
+            color: #333;
+          }
+
+          .preview-content {
+            strong {
+              display: block;
+              margin-bottom: 0.5rem;
+              color: #1976d2;
+            }
+
+            .description {
+              color: #666;
+              margin-bottom: 1rem;
+            }
+
+            .days-list {
+              mat-chip-listbox {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+              }
+            }
+          }
+        }
+
+        .form-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 1rem;
+          margin-top: 2rem;
+
+          button {
+            mat-icon {
+              margin-right: 0.5rem;
+            }
+          }
+        }
+      }
+    }
+
+    .empty-assignment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+
+      mat-card-content {
+        text-align: center;
+        color: #999;
+
+        mat-icon {
+          font-size: 96px;
+          width: 96px;
+          height: 96px;
+          margin-bottom: 1rem;
+        }
+
+        h3 {
+          margin: 0 0 0.5rem 0;
+        }
+
+        p {
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .assign-weeks {
+    .content {
+      grid-template-columns: 1fr;
+
+      .users-card,
+      .assignment-form-card,
+      .empty-assignment {
+        grid-column: 1;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .assign-weeks {
+    .content {
+      .users-card {
+        .users-table {
+          font-size: 0.9rem;
+
+          th, td {
+            padding: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}

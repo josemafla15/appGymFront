@@ -11,6 +11,23 @@ import {
   UserCustomExerciseConfigCreate
 } from '../models';
 
+export interface WeekInfo {
+  assignment: UserWeekAssignment;
+  start_date: string;
+  end_date: string;
+  days_elapsed: number;
+  total_days: number;
+  completed_workouts: number;
+  completion_rate: number;
+  can_renew: boolean;
+  is_current_week: boolean;
+}
+
+export interface RenewWeekResponse {
+  message: string;
+  assignment: UserWeekAssignment;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,6 +38,15 @@ export class AssignmentService {
 
   getMyAssignment(): Observable<UserWeekAssignment> {
     return this.http.get<UserWeekAssignment>(`${this.API_URL}/my-assignment/`);
+  }
+
+  getMyWeekInfo(): Observable<WeekInfo> {
+    return this.http.get<WeekInfo>(`${this.API_URL}/my-week-info/`);
+  }
+
+  renewMyWeek(startDate?: string): Observable<RenewWeekResponse> {
+    const body = startDate ? { start_date: startDate } : {};
+    return this.http.post<RenewWeekResponse>(`${this.API_URL}/renew-my-week/`, body);
   }
 
   assignWeekToUser(userId: number, assignment: UserWeekAssignmentCreate): Observable<UserWeekAssignment> {

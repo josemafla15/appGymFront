@@ -1,146 +1,233 @@
 .do-workout {
-max-width: 800px;
-margin: 0 auto;
-.page-header {
-display: flex;
-align-items: center;
-gap: 1rem;
-margin-bottom: 2rem;
-h1 {
-  margin: 0;
-  color: #333;
-}
+  .header {
+    margin-bottom: 2rem;
 
-p {
-  color: #666;
-  margin: 0;
-}
-}
-.exercises-list {
-display: flex;
-flex-direction: column;
-gap: 1.5rem;
-margin-bottom: 1.5rem;
-.exercise-card {
-  mat-card-header {
-    background-color: #f5f5f5;
-    padding: 1rem;
-    border-radius: 4px 4px 0 0;
-
-    mat-card-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 1.2rem;
-      color: #1976d2;
-      margin: 0;
-
-      button {
-        color: #666;
-        
-        &.has-note {
-          color: #1976d2;
-          
-          mat-icon {
-            color: #1976d2;
-          }
-        }
-
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.05);
-        }
-      }
+    h1 {
+      margin: 1rem 0 0 0;
+      color: #333;
     }
   }
 
-  mat-card-content {
-    padding: 0;
+  .workout-content {
+    .workout-info {
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
 
-    .sets-container {
-      overflow-x: auto;
+      .description {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+      }
 
-      .sets-table {
-        width: 100%;
-        border-collapse: collapse;
+      .meta {
+        display: flex;
+        gap: 2rem;
 
-        thead {
-          background-color: #fafafa;
-          
-          th {
-            padding: 1rem;
-            text-align: left;
-            font-weight: 500;
-            color: #666;
-            border-bottom: 2px solid #e0e0e0;
+        .meta-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
           }
         }
+      }
+    }
 
-        tbody {
-          tr {
-            border-bottom: 1px solid #e0e0e0;
+    .exercise-card {
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
 
-            &.completed {
-              background-color: #e8f5e9;
+      &.completed {
+        background-color: #e8f5e9;
+        border-left: 4px solid #43a047;
 
-              td {
+        .exercise-header {
+          .exercise-title {
+            color: #43a047;
+          }
+        }
+      }
+
+      mat-card-header {
+        mat-card-title {
+          .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+
+            .exercise-title {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              font-size: 1.25rem;
+              font-weight: 600;
+
+              .completed-icon {
+                color: #43a047;
+                font-size: 24px;
+                width: 24px;
+                height: 24px;
+              }
+            }
+          }
+        }
+      }
+
+      mat-card-content {
+        padding-top: 1rem;
+
+        .sets-container {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+
+          .set-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr;
+            gap: 1rem;
+            align-items: center;
+
+            .set-number {
+              font-weight: 500;
+              color: #666;
+            }
+
+            .set-input {
+              margin: 0;
+
+              input[readonly] {
+                cursor: not-allowed;
                 color: #666;
               }
             }
+          }
+        }
 
-            td {
-              padding: 0.5rem 1rem;
+        .exercise-actions {
+          display: flex;
+          justify-content: center;
+          padding: 1rem 0 0.5rem;
+          border-top: 1px solid #e0e0e0;
 
-              &.set-number {
-                font-weight: 600;
-                color: #1976d2;
-                width: 60px;
-              }
+          button {
+            min-width: 220px;
 
-              &.input-cell {
-                width: 120px;
+            mat-icon {
+              margin-right: 0.5rem;
+            }
+          }
 
-                .compact-field {
-                  width: 100%;
-                  margin: 0;
+          .completed-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #43a047;
+            color: white;
+            border-radius: 24px;
+            font-weight: 500;
 
-                  ::ng-deep .mat-mdc-form-field-wrapper {
-                    padding-bottom: 0;
-                  }
-
-                  ::ng-deep .mat-mdc-text-field-wrapper {
-                    padding: 0;
-                  }
-
-                  input {
-                    text-align: center;
-                    font-weight: 500;
-                  }
-                }
-              }
-
-              &.checkbox-cell {
-                width: 80px;
-                text-align: center;
-              }
+            mat-icon {
+              font-size: 24px;
+              width: 24px;
+              height: 24px;
             }
           }
         }
       }
     }
-  }
-}
-}
-.action-buttons {
-display: flex;
-gap: 1rem;
-justify-content: flex-end;
-padding: 1rem 0;
-button {
-  min-width: 150px;
 
-  mat-icon {
-    margin-right: 0.5rem;
+    .progress-card {
+      background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e9 100%);
+      border: 2px solid #1976d2;
+      margin-bottom: 2rem;
+
+      .progress-info {
+        h3 {
+          margin: 0 0 1rem 0;
+          color: #1976d2;
+        }
+
+        .progress-stats {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+
+          span {
+            font-weight: 500;
+            color: #333;
+          }
+
+          mat-progress-bar {
+            height: 12px;
+            border-radius: 6px;
+          }
+        }
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding: 1.5rem 0;
+
+      button {
+        min-width: 160px;
+
+        mat-icon {
+          margin-right: 0.5rem;
+        }
+      }
+    }
   }
 }
-}
+
+@media (max-width: 768px) {
+  .do-workout {
+    .workout-content {
+      .workout-info {
+        .meta {
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+      }
+
+      .exercise-card {
+        mat-card-content {
+          .sets-container {
+            .set-row {
+              grid-template-columns: 1fr;
+              gap: 0.5rem;
+
+              .set-number {
+                font-size: 1rem;
+                font-weight: 600;
+              }
+            }
+          }
+
+          .exercise-actions {
+            button {
+              min-width: 100%;
+            }
+          }
+        }
+      }
+
+      .action-buttons {
+        flex-direction: column;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
 }

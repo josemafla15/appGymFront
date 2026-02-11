@@ -1,89 +1,154 @@
 <div class="do-workout">
-  <div class="page-header">
-    <button mat-icon-button (click)="onCancel()">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <div>
-      <h1>{{ workoutDay?.name || (workoutDay?.type! | workoutType) }}</h1>
-      <p>Complete your workout</p>
+  <div class="header">
+    <app-back-button></app-back-button>
+    <h1 *ngIf="workoutDay">{{ workoutDay.name }}</h1>
+  </div>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
+
+  <div *ngIf="!loading && !errorMessage && workoutDay" class="workout-content">
+    <!-- Info Card simplificada -->
+    <mat-card class="workout-info">
+      <mat-card-content>
+        <div class="meta">
+          <span class="meta-item">
+            <mat-icon>fitness_center</mat-icon>
+            {{ workoutDay.exercises.length }} exercises
+          </span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <form [formGroup]="workoutForm">
+      <div formArrayName="exercises">
+        <mat-card 
+          *ngFor="let exercise of exercisesArray.controls; let i = index" 
+          class="exercise-card"
+          [class.completed]="isExerciseCompleted(i)">
+          <mat-card-header>
+            <mat-card-title>
+              <div class="exercise-header">
+                <div class="exercise-title">
+                  <mat-icon *ngIf="isExerciseCompleted(i)" class="completed-icon">check_circle</mat-icon>
+                  <span>{{ i + 1 }}. {{ exercise.get('exercise_name')?.value }}</span>
+                </div>
+                <button 
+                  mat-icon-button 
+                  type="button"
+                  [matTooltip]="hasNote(i) ? 'Edit note' : 'Add note'"
+                  (click)="onAddExerciseNote(i)"
+                  [color]="hasNote(i) ? 'accent' : ''">
+                  <mat-icon>{{ hasNote(i) ? 'edit_note' : 'note_add' }}</mat-icon>
+                </button>
+              </div>
+            </mat-card-title>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div [formGroupName]="i">
+              <div formArrayName="sets" class="sets-container">
+                <div 
+                  *ngFor="let set of getSetsArray(i).controls; let j = index" 
+                  [formGroupName]="j"
+                  class="set-row">
+                  <span class="set-number">Set {{ j + 1 }}</span>
+                  
+                  <mat-form-field appearance="outline" class="set-input">
+                    <mat-label>Reps</mat-label>
+                    <input 
+                      matInput 
+                      type="number" 
+                      formControlName="reps"
+                      min="0"
+                      [readonly]="isExerciseCompleted(i)">
+                    <mat-error *ngIf="set.get('reps')?.hasError('required')">
+                      Required
+                    </mat-error>
+                    <mat-error *ngIf="set.get('reps')?.hasError('min')">
+                      Must be at least 0
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="set-input">
+                    <mat-label>Weight (kg)</mat-label>
+                    <input 
+                      matInput 
+                      type="number" 
+                      formControlName="weight"
+                      min="0"
+                      step="2.5"
+                      [readonly]="isExerciseCompleted(i)">
+                    <mat-error *ngIf="set.get('weight')?.hasError('min')">
+                      Must be at least 0
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <!-- Botón Done por ejercicio -->
+              <div class="exercise-actions">
+                <button 
+                  *ngIf="!isExerciseCompleted(i)"
+                  mat-raised-button 
+                  color="primary"
+                  type="button"
+                  (click)="onCompleteExercise(i)"
+                  [disabled]="!canCompleteExercise(i) || saving">
+                  <mat-icon>check</mat-icon>
+                  Mark Exercise as Done
+                </button>
+                
+                <div *ngIf="isExerciseCompleted(i)" class="completed-badge">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>Exercise Completed</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </form>
+
+    <!-- Progress Summary -->
+    <mat-card class="progress-card" *ngIf="exercisesArray.length > 0">
+      <mat-card-content>
+        <div class="progress-info">
+          <h3>Workout Progress</h3>
+          <div class="progress-stats">
+            <span>{{ exercisesCompleted.size }} / {{ exercisesArray.length }} exercises completed</span>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="(exercisesCompleted.size / exercisesArray.length) * 100"
+              [color]="allExercisesCompleted() ? 'primary' : 'accent'">
+            </mat-progress-bar>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button 
+        mat-stroked-button 
+        color="warn"
+        type="button"
+        (click)="onCancel()"
+        [disabled]="saving">
+        <mat-icon>close</mat-icon>
+        Cancel
+      </button>
+      
+      <button 
+        mat-raised-button 
+        color="primary"
+        type="button"
+        (click)="onFinishWorkout()"
+        [disabled]="!allExercisesCompleted() || saving">
+        <mat-icon>done_all</mat-icon>
+        Finish Workout
+      </button>
     </div>
   </div>
-<app-loading-spinner *ngIf="loading"></app-loading-spinner>
-<app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
-  <form [formGroup]="workoutForm" *ngIf="!loading && workoutDay">
-    <!-- Exercises -->
-    <div formArrayName="exercises" class="exercises-list">
-      <mat-card *ngFor="let exercise of exercisesArray.controls; let i = index" [formGroupName]="i" class="exercise-card">
-        <mat-card-header>
-          <mat-card-title>
-            <span>{{ exercise.get('exercise_name')?.value }}</span>
-            <button mat-icon-button type="button" 
-                    (click)="onAddExerciseNote(i)"
-                    [class.has-note]="hasNote(i)"
-                    matTooltip="Add note">
-              <mat-icon>{{ hasNote(i) ? 'edit_note' : 'note_add' }}</mat-icon>
-            </button>
-          </mat-card-title>
-        </mat-card-header>
-    <mat-card-content>
-      <!-- Sets Table -->
-      <div formArrayName="sets" class="sets-container">
-        <table class="sets-table">
-          <thead>
-            <tr>
-              <th>Set</th>
-              <th>Reps</th>
-              <th>Weight (kg)</th>
-              <th>Done</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let set of getSetsArray(i).controls; let j = index" 
-                [formGroupName]="j"
-                [class.completed]="set.get('completed')?.value">
-              <td class="set-number">{{ j + 1 }}</td>
-              
-              <td class="input-cell">
-                <mat-form-field appearance="outline" class="compact-field">
-                  <input matInput type="number" formControlName="reps" min="0"
-                         [readonly]="set.get('completed')?.value">
-                </mat-form-field>
-              </td>
-
-              <td class="input-cell">
-                <mat-form-field appearance="outline" class="compact-field">
-                  <input matInput type="number" formControlName="weight" min="0" step="2.5"
-                         [readonly]="set.get('completed')?.value">
-                </mat-form-field>
-              </td>
-
-              <td class="checkbox-cell">
-                <mat-checkbox 
-                  formControlName="completed"
-                  [disabled]="set.get('completed')?.value"
-                  (change)="onSetCompleted(i, j)">
-                </mat-checkbox>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </mat-card-content>
-  </mat-card>
-</div>
-
-<!-- Actions -->
-<div class="action-buttons">
-  <button mat-stroked-button type="button" (click)="onCancel()">
-    Cancel
-  </button>
-  <button mat-raised-button color="primary" type="button" 
-          (click)="onFinishWorkout()"
-          [disabled]="!allSetsCompleted() || saving">
-    <mat-icon>check_circle</mat-icon>
-    <span *ngIf="!saving">Finish Workout</span>
-    <mat-spinner *ngIf="saving" diameter="20"></mat-spinner>
-  </button>
-</div>
-  </form>
 </div>

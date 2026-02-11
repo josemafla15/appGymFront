@@ -1,1 +1,28 @@
-<p>exercise-note-dialog works!</p>
+<h2 mat-dialog-title>Exercise Notes</h2>
+
+<mat-dialog-content>
+  <p class="exercise-name">{{ data.exerciseName }}</p>
+  
+  <form [formGroup]="noteForm">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes</mat-label>
+      <textarea 
+        matInput 
+        formControlName="note"
+        rows="6"
+        placeholder="Add notes about sets, form, weight progression, etc..."
+        maxlength="500"></textarea>
+      <mat-hint align="end">{{ noteForm.get('note')?.value?.length || 0 }}/500</mat-hint>
+      <mat-error *ngIf="noteForm.get('note')?.hasError('maxlength')">
+        Maximum 500 characters
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="noteForm.invalid">
+    Save
+  </button>
+</mat-dialog-actions>

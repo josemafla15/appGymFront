@@ -1,0 +1,121 @@
+mat-dialog-content {
+  min-width: 450px;
+  padding: 1.5rem 0;
+
+  .dialog-info {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+
+    mat-icon {
+      color: #1976d2;
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    div {
+      flex: 1;
+
+      p {
+        margin: 0;
+        
+        &.current-week {
+          color: #666;
+          font-size: 0.9rem;
+          margin-top: 0.25rem;
+        }
+      }
+    }
+  }
+
+  mat-divider {
+    margin: 1.5rem 0;
+  }
+
+  .renew-form {
+    .info-message {
+      background-color: #e3f2fd;
+      padding: 1rem;
+      border-radius: 4px;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+
+      mat-icon {
+        color: #1976d2;
+      }
+
+      p {
+        margin: 0;
+        color: #333;
+      }
+    }
+
+    .auto-checkbox {
+      margin-bottom: 1rem;
+    }
+
+    .full-width {
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary {
+      background-color: #e8f5e9;
+      padding: 1rem;
+      border-radius: 4px;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+
+      mat-icon {
+        color: #43a047;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+
+      div {
+        flex: 1;
+
+        p {
+          margin: 0 0 0.5rem 0;
+          color: #333;
+        }
+
+        ul {
+          margin: 0;
+          padding-left: 1.5rem;
+          color: #666;
+
+          li {
+            margin: 0.25rem 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+mat-dialog-actions {
+  padding: 1rem 0 0;
+  margin: 0;
+
+  button {
+    mat-icon {
+      margin-right: 0.5rem;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  mat-dialog-content {
+    min-width: 300px;
+  }
+}

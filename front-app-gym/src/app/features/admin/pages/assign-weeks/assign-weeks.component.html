@@ -1,0 +1,197 @@
+<div class="assign-weeks">
+  <div class="header">
+    <h1>Assign Workout Weeks to Users</h1>
+    <p class="subtitle">Manage user workout programs and schedules</p>
+  </div>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <div *ngIf="!loading" class="content">
+    <!-- Users Table -->
+    <mat-card class="users-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>people</mat-icon>
+          Active Users
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="users" class="users-table">
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let user">{{ getUserFullName(user) }}</td>
+          </ng-container>
+
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+          </ng-container>
+
+          <!-- Current Assignment Column -->
+          <ng-container matColumnDef="current_assignment">
+            <th mat-header-cell *matHeaderCellDef>Current Program</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="assignment-cell">
+                <mat-chip 
+                  *ngIf="hasAssignment(user)"
+                  class="assigned-chip">
+                  <mat-icon>check_circle</mat-icon>
+                  {{ user.current_assignment?.week_template_name }}
+                </mat-chip>
+                <span *ngIf="!hasAssignment(user)" class="no-assignment">
+                  Not assigned
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let user">
+              <button 
+                mat-raised-button 
+                color="primary"
+                (click)="onSelectUser(user)"
+                [disabled]="saving">
+                <mat-icon>assignment</mat-icon>
+                {{ hasAssignment(user) ? 'Reassign' : 'Assign' }}
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr 
+            mat-row 
+            *matRowDef="let row; columns: displayedColumns;"
+            [class.selected-row]="selectedUser?.id === row.id">
+          </tr>
+        </table>
+
+        <div *ngIf="users.length === 0" class="empty-state">
+          <mat-icon>people_outline</mat-icon>
+          <p>No users found</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Assignment Form -->
+    <mat-card class="assignment-form-card" *ngIf="selectedUser">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>assignment_turned_in</mat-icon>
+          Assign Week to {{ getUserFullName(selectedUser) }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="assignmentForm" (ngSubmit)="onAssignWeek()">
+          <!-- User Info (Read-only) -->
+          <div class="user-info">
+            <mat-icon>person</mat-icon>
+            <div>
+              <strong>{{ getUserFullName(selectedUser) }}</strong>
+              <p>{{ selectedUser.email }}</p>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Current Assignment Info -->
+          <div class="current-assignment-info" *ngIf="hasAssignment(selectedUser)">
+            <mat-icon>info</mat-icon>
+            <div>
+              <strong>Current Assignment:</strong>
+              <p>{{ getCurrentAssignment(selectedUser) }}</p>
+              <p class="warning-text">
+                <mat-icon>warning</mat-icon>
+                Assigning a new week will deactivate the current one
+              </p>
+            </div>
+          </div>
+
+          <!-- Week Template Selection -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Workout Week Template</mat-label>
+            <mat-select formControlName="week_template_id" required>
+              <mat-option *ngFor="let template of weekTemplates" [value]="template.id">
+                {{ template.name }} ({{ template.days.length }} days)
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>fitness_center</mat-icon>
+            <mat-hint>Select the workout program</mat-hint>
+            <mat-error *ngIf="assignmentForm.get('week_template_id')?.hasError('required')">
+              Week template is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Start Date -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Start Date</mat-label>
+            <input 
+              matInput 
+              [matDatepicker]="picker"
+              formControlName="start_date"
+              required>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-icon matPrefix>event</mat-icon>
+            <mat-hint>When should this program start?</mat-hint>
+            <mat-error *ngIf="assignmentForm.get('start_date')?.hasError('required')">
+              Start date is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Preview (if template selected) -->
+          <div class="template-preview" *ngIf="assignmentForm.get('week_template_id')?.value">
+            <h4>Program Preview</h4>
+            <div class="preview-content">
+              <ng-container *ngFor="let template of weekTemplates">
+                <div *ngIf="template.id === assignmentForm.get('week_template_id')?.value">
+                  <p><strong>{{ template.name }}</strong></p>
+                  <p class="description" *ngIf="template.description">{{ template.description }}</p>
+                  <div class="days-list">
+                    <mat-chip-listbox>
+                      <mat-chip *ngFor="let day of template.days; let i = index">
+                        Day {{ i + 1 }}
+                      </mat-chip>
+                    </mat-chip-listbox>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="form-actions">
+            <button 
+              mat-stroked-button 
+              type="button"
+              (click)="selectedUser = null"
+              [disabled]="saving">
+              Cancel
+            </button>
+            <button 
+              mat-raised-button 
+              color="primary"
+              type="submit"
+              [disabled]="assignmentForm.invalid || saving">
+              <mat-icon>check</mat-icon>
+              {{ saving ? 'Assigning...' : 'Assign Week' }}
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Empty State -->
+    <mat-card class="empty-assignment" *ngIf="!selectedUser">
+      <mat-card-content>
+        <mat-icon>touch_app</mat-icon>
+        <h3>Select a User</h3>
+        <p>Click "Assign" or "Reassign" on a user to get started</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

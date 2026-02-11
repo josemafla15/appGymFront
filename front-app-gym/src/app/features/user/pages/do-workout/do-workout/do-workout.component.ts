@@ -6,6 +6,7 @@ import { WorkoutDayTemplate } from '@core/models';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { ExerciseNoteDialogComponent } from '../exercise-note-dialog/exercise-note-dialog/exercise-note-dialog.component';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-do-workout',
@@ -23,10 +24,14 @@ export class DoWorkoutComponent implements OnInit {
 
   // Almacenar notas por ejercicio
   exerciseNotes: Map<number, string> = new Map();
+  
+  // Track which exercises are completed
+  exercisesCompleted: Set<number> = new Set();
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private fb: FormBuilder,
     private workoutService: WorkoutService,
     private trackingService: TrackingService,
@@ -64,7 +69,7 @@ export class DoWorkoutComponent implements OnInit {
       next: (workoutDay) => {
         this.workoutDay = workoutDay;
         this.setupExerciseForms();
-        this.createWorkoutLog();
+        this.createOrLoadWorkoutLog();
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -82,13 +87,11 @@ export class DoWorkoutComponent implements OnInit {
     this.workoutDay.exercises.forEach((exercise, exerciseIndex) => {
       const sets = this.fb.array<FormGroup>([]);
 
-      
       // Crear un form group para cada set
       for (let i = 0; i < exercise.number_of_sets; i++) {
         sets.push(this.fb.group({
           reps: [0, [Validators.required, Validators.min(0)]],
-          weight: [0, [Validators.min(0)]],
-          completed: [false]
+          weight: [0, [Validators.min(0)]]
         }));
       }
 
@@ -105,21 +108,139 @@ export class DoWorkoutComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  private createWorkoutLog(): void {
+  private createOrLoadWorkoutLog(): void {
     if (!this.workoutDay) return;
 
     const today = new Date().toISOString().split('T')[0];
     
+    // Primero intentar obtener el log existente
+    this.trackingService.getWorkoutLogs({ 
+      date: today,
+      completed: false  
+    }).subscribe({
+      next: (logs) => {
+        // Buscar si ya existe un log para este workout_day hoy
+        const existingLog = logs.find(log => 
+          log.workout_day_name === this.workoutDay?.name
+        );
+
+        if (existingLog) {
+          // Si existe, cargar ese log
+          console.log('Found existing workout log:', existingLog.id);
+          this.workoutLogId = existingLog.id;
+          this.loadExistingSets(existingLog.id);
+        } else {
+          // Si no existe, crear uno nuevo
+          this.createNewWorkoutLog(today);
+        }
+      },
+      error: () => {
+        // Si falla la búsqueda, intentar crear uno nuevo
+        this.createNewWorkoutLog(today);
+      }
+    });
+  }
+
+  private createNewWorkoutLog(date: string): void {
+    if (!this.workoutDay) return;
+
     this.trackingService.createWorkoutLog({
       workout_day_id: this.workoutDay.id,
-      date: today,
+      date: date,
       notes: ''
     }).subscribe({
       next: (log) => {
+        console.log('Created new workout log:', log.id);
         this.workoutLogId = log.id;
       },
       error: (err) => {
         console.error('Error creating workout log:', err);
+        
+        // Si el error es de duplicado, intentar obtener el existente
+        if (err.status === 500 && err.error?.includes?.('duplicate')) {
+          this.findExistingLog();
+        } else {
+          this.snackBar.open('Error creating workout log', 'Close', { duration: 3000 });
+        }
+      }
+    });
+  }
+
+  private findExistingLog(): void {
+    const today = new Date().toISOString().split('T')[0];
+    
+    this.trackingService.getWorkoutLogs({ date: today }).subscribe({
+      next: (logs) => {
+        const existingLog = logs.find(log => 
+          log.workout_day_name === this.workoutDay?.name
+        );
+        
+        if (existingLog) {
+          console.log('Found existing log after error:', existingLog.id);
+          this.workoutLogId = existingLog.id;
+          this.loadExistingSets(existingLog.id);
+        }
+      },
+      error: (err) => {
+        console.error('Error finding existing log:', err);
+      }
+    });
+  }
+
+  private loadExistingSets(workoutLogId: number): void {
+    this.trackingService.getWorkoutLog(workoutLogId).subscribe({
+      next: (log) => {
+        console.log('Loading existing sets:', log.set_logs);
+        
+        // Agrupar sets por ejercicio para determinar cuáles están completos
+        const setsByExercise = new Map<number, any[]>();
+        
+        log.set_logs.forEach(setLog => {
+          const exerciseId = setLog.exercise.id;
+          if (!setsByExercise.has(exerciseId)) {
+            setsByExercise.set(exerciseId, []);
+          }
+          setsByExercise.get(exerciseId)!.push(setLog);
+        });
+        
+        // Cargar los valores en el formulario
+        for (let i = 0; i < this.exercisesArray.length; i++) {
+          const exerciseControl = this.exercisesArray.at(i);
+          const exerciseId = exerciseControl.get('exercise_id')?.value;
+          const setsArray = this.getSetsArray(i);
+          
+          const exerciseSets = setsByExercise.get(exerciseId) || [];
+          
+          // Si hay sets guardados para este ejercicio
+          if (exerciseSets.length > 0) {
+            // Cargar valores de sets
+            exerciseSets.forEach(setLog => {
+              const setIndex = setLog.set_number - 1;
+              
+              if (setIndex >= 0 && setIndex < setsArray.length) {
+                const setControl = setsArray.at(setIndex);
+                setControl.patchValue({
+                  reps: setLog.reps,
+                  weight: setLog.weight || 0
+                });
+              }
+            });
+            
+            // Si todos los sets del ejercicio están guardados, marcar como completado
+            if (exerciseSets.length === setsArray.length) {
+              this.exercisesCompleted.add(i);
+              // Deshabilitar todos los inputs del ejercicio
+              setsArray.controls.forEach(control => {
+                control.disable();
+              });
+            }
+          }
+        }
+        
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error loading sets:', err);
       }
     });
   }
@@ -128,40 +249,86 @@ export class DoWorkoutComponent implements OnInit {
     return (this.exercisesArray.at(exerciseIndex).get('sets') as FormArray);
   }
 
-  onSetCompleted(exerciseIndex: number, setIndex: number): void {
-    const setsArray = this.getSetsArray(exerciseIndex);
-    const setControl = setsArray.at(setIndex);
-    const completed = setControl.get('completed')?.value;
+  isExerciseCompleted(exerciseIndex: number): boolean {
+    return this.exercisesCompleted.has(exerciseIndex);
+  }
+
+  canCompleteExercise(exerciseIndex: number): boolean {
+    // Ya completado
+    if (this.isExerciseCompleted(exerciseIndex)) {
+      return false;
+    }
     
-    // Validar que tenga al menos 1 rep
-    const reps = setControl.get('reps')?.value;
-    if (!completed && reps <= 0) {
-      this.snackBar.open('Please enter at least 1 rep', 'Close', { duration: 2000 });
+    // Verificar que todos los sets tengan al menos 1 rep
+    const setsArray = this.getSetsArray(exerciseIndex);
+    for (let i = 0; i < setsArray.length; i++) {
+      const reps = setsArray.at(i).get('reps')?.value;
+      if (!reps || reps <= 0) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  onCompleteExercise(exerciseIndex: number): void {
+    if (!this.workoutLogId) {
+      this.snackBar.open('Error: No workout log found', 'Close', { duration: 3000 });
       return;
     }
 
-    if (!completed && this.workoutLogId) {
-      // Guardar el set cuando se marca como completado
-      const exerciseId = this.exercisesArray.at(exerciseIndex).get('exercise_id')?.value;
+    if (!this.canCompleteExercise(exerciseIndex)) {
+      this.snackBar.open('Please enter at least 1 rep for all sets', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const setsArray = this.getSetsArray(exerciseIndex);
+    const exerciseId = this.exercisesArray.at(exerciseIndex).get('exercise_id')?.value;
+    
+    // Guardar todos los sets del ejercicio
+    const savePromises: Promise<any>[] = [];
+    
+    for (let setIndex = 0; setIndex < setsArray.length; setIndex++) {
+      const setControl = setsArray.at(setIndex);
+      const reps = setControl.get('reps')?.value;
       const weight = setControl.get('weight')?.value;
 
-      this.trackingService.addSetToWorkout(this.workoutLogId, {
+      const promise = this.trackingService.addSetToWorkout(this.workoutLogId, {
         exercise_id: exerciseId,
         set_number: setIndex + 1,
         reps: reps,
         weight: weight || undefined
-      }).subscribe({
-        next: () => {
-          setControl.patchValue({ completed: true });
-          this.snackBar.open('Set saved! ✓', 'Close', { duration: 1500 });
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          this.snackBar.open('Error saving set', 'Close', { duration: 3000 });
-          console.error('Error saving set:', err);
-        }
-      });
+      }).toPromise();
+      
+      savePromises.push(promise);
     }
+
+    // Ejecutar todas las promesas
+    this.saving = true;
+    this.cdr.markForCheck();
+
+    Promise.all(savePromises)
+      .then(() => {
+        // Marcar ejercicio como completado
+        this.exercisesCompleted.add(exerciseIndex);
+        
+        // Deshabilitar todos los inputs del ejercicio
+        setsArray.controls.forEach(control => {
+          control.disable();
+        });
+        
+        this.saving = false;
+        this.snackBar.open(`${this.exercisesArray.at(exerciseIndex).get('exercise_name')?.value} completed! ✓`, 'Close', { 
+          duration: 2000 
+        });
+        this.cdr.markForCheck();
+      })
+      .catch((err) => {
+        console.error('Error saving sets:', err);
+        this.saving = false;
+        this.snackBar.open('Error saving exercise', 'Close', { duration: 3000 });
+        this.cdr.markForCheck();
+      });
   }
 
   onAddExerciseNote(exerciseIndex: number): void {
@@ -189,18 +356,9 @@ export class DoWorkoutComponent implements OnInit {
     return !!note && note.trim().length > 0;
   }
 
-  allSetsCompleted(): boolean {
+  allExercisesCompleted(): boolean {
     if (this.exercisesArray.length === 0) return false;
-    
-    for (let i = 0; i < this.exercisesArray.length; i++) {
-      const sets = this.getSetsArray(i);
-      for (let j = 0; j < sets.length; j++) {
-        if (!sets.at(j).get('completed')?.value) {
-          return false;
-        }
-      }
-    }
-    return true;
+    return this.exercisesCompleted.size === this.exercisesArray.length;
   }
 
   onFinishWorkout(): void {
@@ -249,5 +407,13 @@ export class DoWorkoutComponent implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/user/workouts']);
+  }
+
+  goBack(): void {
+    this.location.back();
+  }
+
+  goToDashboard(): void {
+    this.router.navigate(['/user/dashboard']);
   }
 }

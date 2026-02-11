@@ -3,6 +3,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { AdminLayout } from './components/admin-layout/admin-layout';
 import { AdminDashboardComponent } from './pages/dashboard/dashboard.component';
 
+// NUEVO
+import { AssignWeeksComponent } from './pages/assign-weeks/assign-weeks.component';
+
 // Exercises
 import { ExerciseListComponent } from './pages/exercises/exercise-list/exercise-list.component';
 import { ExerciseFormComponent } from './pages/exercises/exercise-form/exercise-form.component';
@@ -24,25 +27,28 @@ const routes: Routes = [
     component: AdminLayout,
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      
+
       // Dashboard
       { path: 'dashboard', component: AdminDashboardComponent },
-      
+
+      // ✅ NUEVA RUTA
+      { path: 'assign-weeks', component: AssignWeeksComponent },
+
       // Exercises
       { path: 'exercises', component: ExerciseListComponent },
       { path: 'exercises/new', component: ExerciseFormComponent },
       { path: 'exercises/edit/:id', component: ExerciseFormComponent },
-      
+
       // Workout Days
       { path: 'workout-days', component: WorkoutDayListComponent },
       { path: 'workout-days/new', component: WorkoutDayFormComponent },
       { path: 'workout-days/edit/:id', component: WorkoutDayFormComponent },
-      
+
       // Workout Weeks
       { path: 'workout-weeks', component: WorkoutWeekListComponent },
       { path: 'workout-weeks/new', component: WorkoutWeekFormComponent },
       { path: 'workout-weeks/edit/:id', component: WorkoutWeekFormComponent },
-      
+
       // Users
       { path: 'users', component: UserListComponent }
     ]
@@ -53,4 +59,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class AdminRoutingModule { }
+export class AdminRoutingModule {}

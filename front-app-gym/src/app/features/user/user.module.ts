@@ -11,6 +11,11 @@ import { DoWorkoutComponent } from './pages/do-workout/do-workout/do-workout.com
 
 // Dialogs
 import { ExerciseNoteDialogComponent } from './pages/do-workout/exercise-note-dialog/exercise-note-dialog/exercise-note-dialog.component';
+import { RenewWeekDialogComponent } from './pages/renew-week-dialog/renew-week-dialog.component';
+
+// Material Modules
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @NgModule({
   declarations: [
@@ -19,11 +24,14 @@ import { ExerciseNoteDialogComponent } from './pages/do-workout/exercise-note-di
     DashboardComponent,
     MyWorkoutsComponent,
     DoWorkoutComponent,
-    ExerciseNoteDialogComponent
+    ExerciseNoteDialogComponent,
+    RenewWeekDialogComponent
   ],
   imports: [
     SharedModule,
-    UserRoutingModule
+    UserRoutingModule,
+    MatCheckboxModule,
+    MatProgressBarModule
   ]
 })
 export class UserModule { }

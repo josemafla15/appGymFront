@@ -9,6 +9,9 @@ import { Sidebar } from './components/sidebar/sidebar';
 // Dashboard
 import { AdminDashboardComponent } from './pages/dashboard/dashboard.component';
 
+// ✅ NUEVO
+import { AssignWeeksComponent } from './pages/assign-weeks/assign-weeks.component';
+
 // Exercises
 import { ExerciseListComponent } from './pages/exercises/exercise-list/exercise-list.component';
 import { ExerciseFormComponent } from './pages/exercises/exercise-form/exercise-form.component';
@@ -24,33 +27,44 @@ import { WorkoutWeekFormComponent } from './pages/workout-weeks/workout-week-for
 // Users
 import { UserListComponent } from './pages/users/user-list/user-list.component';
 
+// ✅ Material extra
+import { MatTableModule } from '@angular/material/table';
+import { MatChipsModule } from '@angular/material/chips';
+
 @NgModule({
   declarations: [
     // Layout
     AdminLayout,
     Sidebar,
-    
+
     // Dashboard
     AdminDashboardComponent,
-    
+
+    // ✅ Nuevo
+    AssignWeeksComponent,
+
     // Exercises
     ExerciseListComponent,
     ExerciseFormComponent,
-    
+
     // Workout Days
     WorkoutDayListComponent,
     WorkoutDayFormComponent,
-    
+
     // Workout Weeks
     WorkoutWeekListComponent,
     WorkoutWeekFormComponent,
-    
+
     // Users
     UserListComponent
   ],
   imports: [
     SharedModule,
-    AdminRoutingModule
+    AdminRoutingModule,
+
+    // ✅ Material
+    MatTableModule,
+    MatChipsModule
   ]
 })
 export class AdminModule { }

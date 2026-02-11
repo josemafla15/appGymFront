@@ -13,7 +13,7 @@ const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'workouts', component: MyWorkoutsComponent },
-      { path: 'workout/:id', component: DoWorkoutComponent }
+      { path: 'do-workout/:id', component: DoWorkoutComponent }
     ]
   }
 ];

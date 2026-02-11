@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
@@ -14,11 +14,21 @@ import { AuthService } from '../services/auth.service';
 export class JwtInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  private authService: AuthService | null = null;
 
-  constructor(private authService: AuthService) {}
+  constructor(private injector: Injector) {}
+
+  // Lazy load AuthService para evitar dependencia circular
+  private getAuthService(): AuthService {
+    if (!this.authService) {
+      this.authService = this.injector.get(AuthService);
+    }
+    return this.authService;
+  }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const token = this.authService.getAccessToken();
+    const authService = this.getAuthService();
+    const token = authService.getAccessToken();
     
     if (token) {
       request = this.addToken(request, token);
@@ -48,7 +58,9 @@ export class JwtInterceptor implements HttpInterceptor {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
 
-      return this.authService.refreshToken().pipe(
+      const authService = this.getAuthService();
+
+      return authService.refreshToken().pipe(
         switchMap((tokenResponse: any) => {
           this.isRefreshing = false;
           this.refreshTokenSubject.next(tokenResponse.access);
@@ -56,7 +68,7 @@ export class JwtInterceptor implements HttpInterceptor {
         }),
         catchError((err) => {
           this.isRefreshing = false;
-          this.authService.logout();
+          authService.logout();
           return throwError(() => err);
         })
       );

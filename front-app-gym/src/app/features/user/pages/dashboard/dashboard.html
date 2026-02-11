@@ -50,28 +50,50 @@
     </div>
 
     <!-- Current Program -->
-    <mat-card *ngIf="assignment" class="program-card">
+    <mat-card *ngIf="assignment && weekInfo" class="program-card">
       <mat-card-header>
         <mat-card-title>
           <mat-icon>calendar_today</mat-icon>
-          Current Program
+          Current Week
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <h2>{{ assignment.week_template.name }}</h2>
         <p class="description">{{ assignment.week_template.description }}</p>
         
-        <div class="program-meta">
-          <div class="meta-item">
-            <mat-icon>event</mat-icon>
-            <span>Started: {{ assignment.start_date | date:'mediumDate' }}</span>
+        <!-- Week Progress -->
+        <div class="week-progress">
+          <div class="progress-header">
+            <span>This Week's Progress</span>
+            <span class="progress-percentage">{{ getWeekProgress() }}%</span>
           </div>
-          <div class="meta-item">
-            <mat-icon>view_week</mat-icon>
-            <span>{{ assignment.week_template.days.length }} days per week</span>
+          <mat-progress-bar 
+            mode="determinate" 
+            [value]="getWeekProgress()"
+            [color]="getProgressColor()">
+          </mat-progress-bar>
+          <div class="progress-info">
+            <span>{{ weekInfo.completed_workouts }} of {{ weekInfo.total_days }} workouts completed</span>
           </div>
         </div>
 
+        <!-- Week Dates -->
+        <div class="program-meta">
+          <div class="meta-item">
+            <mat-icon>event</mat-icon>
+            <span>{{ weekInfo.start_date | date:'mediumDate' }} - {{ weekInfo.end_date | date:'mediumDate' }}</span>
+          </div>
+          <div class="meta-item">
+            <mat-icon>view_week</mat-icon>
+            <span>Day {{ weekInfo.days_elapsed }} of 7</span>
+          </div>
+          <div class="meta-item" *ngIf="!weekInfo.is_current_week">
+            <mat-icon>warning</mat-icon>
+            <span class="warning-text">This week has ended</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
         <div class="action-buttons">
           <button mat-raised-button color="primary" routerLink="/user/workouts">
             <mat-icon>play_arrow</mat-icon>
@@ -81,7 +103,28 @@
             <mat-icon>assessment</mat-icon>
             View Progress
           </button>
+          <button 
+            *ngIf="weekInfo.can_renew" 
+            mat-raised-button 
+            color="accent"
+            (click)="onRenewWeek()">
+            <mat-icon>autorenew</mat-icon>
+            Start New Week
+          </button>
         </div>
+
+        <!-- Renew Message -->
+        <mat-card *ngIf="weekInfo.can_renew && !weekInfo.is_current_week" class="renew-message">
+          <mat-card-content>
+            <div class="renew-content">
+              <mat-icon>info</mat-icon>
+              <div>
+                <h4>Ready for a new week?</h4>
+                <p>Your current week has ended. Click "Start New Week" to continue with the same program.</p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
       </mat-card-content>
     </mat-card>
 
