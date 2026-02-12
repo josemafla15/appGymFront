@@ -89,6 +89,13 @@
                 margin: 0;
                 font-size: 1.25rem;
                 font-weight: 600;
+
+                // ✅ NUEVO: Estilo para el número de día
+                .day-number {
+                  color: #666;
+                  font-weight: 500;
+                  margin-right: 0.25rem;
+                }
               }
             }
 

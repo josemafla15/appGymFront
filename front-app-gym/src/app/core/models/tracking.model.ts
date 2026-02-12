@@ -23,6 +23,7 @@ export interface WorkoutLog {
   user: number;
   workout_day: WorkoutDayTemplate;
   workout_day_id?: number;
+  day_order: number;  // ✅ NUEVO: Posición del día en la semana
   date: string;
   completed: boolean;
   notes: string;
@@ -33,14 +34,17 @@ export interface WorkoutLog {
 
 export interface WorkoutLogCreate {
   workout_day_id: number;
+  day_order?: number;  // ✅ NUEVO: Posición del día en la semana
   date: string;
   notes?: string;
 }
 
 export interface WorkoutLogList {
   id: number;
+  workout_day: number;  // ✅ NUEVO: ID del workout day template
   workout_day_name: string;
   workout_day_type: string;
+  day_order: number;  // ✅ NUEVO: Posición del día en la semana
   date: string;
   completed: boolean;
   total_sets: number;

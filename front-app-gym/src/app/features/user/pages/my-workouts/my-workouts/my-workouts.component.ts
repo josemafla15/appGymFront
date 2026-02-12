@@ -5,6 +5,7 @@ import { UserWeekAssignment } from '@core/models';
 
 interface WorkoutDayStatus {
   day: any;
+  dayOrder: number;  // ✅ NUEVO: Posición del día en la semana
   isCompletedToday: boolean;
   workoutLog?: any;
 }
@@ -64,33 +65,55 @@ export class MyWorkoutsComponent implements OnInit {
       date: this.today 
     }).subscribe({
       next: (logs) => {
-        // Crear mapa de workouts completados por nombre del workout
+        console.log('📊 Logs recibidos del backend:', logs);
+        
+        // ✅ CAMBIO CRÍTICO: Crear mapa usando workout_day_id + day_order
+        // En lugar de solo usar el nombre del workout
         const completedWorkoutsMap = new Map<string, any>();
+        
         logs.forEach(log => {
-          if (log.completed && log.workout_day_name) {
-            completedWorkoutsMap.set(log.workout_day_name, log);
+          if (log.completed) {
+            // ✅ Clave única: workout_day_id + day_order
+            const key = `${log.workout_day}_${log.day_order}`;
+            completedWorkoutsMap.set(key, log);
+            console.log(`✅ Log completado: workout_day=${log.workout_day}, day_order=${log.day_order}, key=${key}`);
           }
         });
 
         // Verificar estado de cada día
-        this.workoutStatuses = this.assignment!.week_template.days.map(day => {
-          const workoutDayName = day.workout_day.name;
-          const isCompletedToday = completedWorkoutsMap.has(workoutDayName);
+        this.workoutStatuses = this.assignment!.week_template.days.map((weekDay, index) => {
+          // ✅ IMPORTANTE: Usar day_order del modelo WorkoutWeekDay
+          const dayOrder = weekDay.day_order;
+          const workoutDayId = weekDay.workout_day.id;
+          
+          // ✅ Crear la misma clave única que se usa para guardar
+          const key = `${workoutDayId}_${dayOrder}`;
+          const isCompletedToday = completedWorkoutsMap.has(key);
+          
+          console.log(`🔍 Día ${dayOrder}: ${weekDay.workout_day.name}`);
+          console.log(`   - workout_day_id: ${workoutDayId}`);
+          console.log(`   - day_order: ${dayOrder}`);
+          console.log(`   - key: ${key}`);
+          console.log(`   - ¿Completado?: ${isCompletedToday}`);
+          
           return {
-            day: day.workout_day,
+            day: weekDay.workout_day,
+            dayOrder: dayOrder,  // ✅ NUEVO: Guardar la posición
             isCompletedToday: isCompletedToday,
-            workoutLog: completedWorkoutsMap.get(workoutDayName)
+            workoutLog: completedWorkoutsMap.get(key)
           };
         });
 
+        console.log('✅ Estados finales:', this.workoutStatuses);
         this.loading = false;
         this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error('Error loading workout logs:', err);
+        console.error('❌ Error loading workout logs:', err);
         // Si falla, mostrar todos como no completados
-        this.workoutStatuses = this.assignment!.week_template.days.map(day => ({
-          day: day.workout_day,
+        this.workoutStatuses = this.assignment!.week_template.days.map((weekDay, index) => ({
+          day: weekDay.workout_day,
+          dayOrder: weekDay.day_order,  // ✅ NUEVO
           isCompletedToday: false
         }));
         this.loading = false;
@@ -99,14 +122,22 @@ export class MyWorkoutsComponent implements OnInit {
     });
   }
 
-  onStartWorkout(dayId: number): void {
-    this.router.navigate(['/user/do-workout', dayId]);
+  // ✅ ACTUALIZADO: Pasar dayOrder como query param
+  onStartWorkout(dayId: number, dayOrder: number): void {
+    this.router.navigate(['/user/do-workout', dayId], {
+      queryParams: { dayOrder: dayOrder }  // ✅ NUEVO: Pasar posición del día
+    });
   }
 
-  onViewWorkout(dayId: number): void {
+  // ✅ ACTUALIZADO: Pasar dayOrder como query param
+  onViewWorkout(dayId: number, dayOrder: number): void {
     // Navegar a vista de solo lectura o historial
     this.router.navigate(['/user/history'], { 
-      queryParams: { workoutDayId: dayId, date: this.today } 
+      queryParams: { 
+        workoutDayId: dayId, 
+        dayOrder: dayOrder,  // ✅ NUEVO
+        date: this.today 
+      } 
     });
   }
 

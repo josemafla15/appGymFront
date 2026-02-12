@@ -21,6 +21,7 @@ export class DoWorkoutComponent implements OnInit {
   saving = false;
   errorMessage = '';
   workoutLogId: number | null = null;
+  dayOrder: number | null = null;  // ✅ NUEVO: Posición del día en la semana
 
   // Almacenar notas por ejercicio
   exerciseNotes: Map<number, string> = new Map();
@@ -57,6 +58,14 @@ export class DoWorkoutComponent implements OnInit {
 
   private loadWorkoutDay(): void {
     const id = this.route.snapshot.paramMap.get('id');
+    
+    // ✅ NUEVO: Obtener day_order de los query params (si viene desde my-workouts)
+    const dayOrderParam = this.route.snapshot.queryParamMap.get('dayOrder');
+    if (dayOrderParam) {
+      this.dayOrder = parseInt(dayOrderParam, 10);
+      console.log('✅ Day order recibido:', this.dayOrder);
+    }
+    
     if (!id) {
       this.router.navigate(['/user/workouts']);
       return;
@@ -119,18 +128,30 @@ export class DoWorkoutComponent implements OnInit {
       completed: false  
     }).subscribe({
       next: (logs) => {
-        // Buscar si ya existe un log para este workout_day hoy
-        const existingLog = logs.find(log => 
-          log.workout_day_name === this.workoutDay?.name
-        );
+        // ✅ CAMBIO CRÍTICO: Buscar por workout_day_id Y day_order
+        const existingLog = logs.find(log => {
+          const matchesWorkoutDay = log.workout_day === this.workoutDay?.id;
+          const matchesDayOrder = this.dayOrder ? log.day_order === this.dayOrder : true;
+          
+          console.log('🔍 Comparando log:', {
+            logWorkoutDay: log.workout_day,
+            currentWorkoutDay: this.workoutDay?.id,
+            logDayOrder: log.day_order,
+            currentDayOrder: this.dayOrder,
+            matches: matchesWorkoutDay && matchesDayOrder
+          });
+          
+          return matchesWorkoutDay && matchesDayOrder;
+        });
 
         if (existingLog) {
           // Si existe, cargar ese log
-          console.log('Found existing workout log:', existingLog.id);
+          console.log('✅ Found existing workout log:', existingLog.id);
           this.workoutLogId = existingLog.id;
           this.loadExistingSets(existingLog.id);
         } else {
           // Si no existe, crear uno nuevo
+          console.log('ℹ️ No existing log found, creating new one');
           this.createNewWorkoutLog(today);
         }
       },
@@ -144,17 +165,30 @@ export class DoWorkoutComponent implements OnInit {
   private createNewWorkoutLog(date: string): void {
     if (!this.workoutDay) return;
 
-    this.trackingService.createWorkoutLog({
+    // ✅ CAMBIO CRÍTICO: Incluir day_order en la creación del log
+    const logData: any = {
       workout_day_id: this.workoutDay.id,
       date: date,
       notes: ''
-    }).subscribe({
+    };
+    
+    // ✅ NUEVO: Si tenemos day_order, incluirlo
+    if (this.dayOrder !== null) {
+      logData.day_order = this.dayOrder;
+      console.log('✅ Creating log with day_order:', this.dayOrder);
+    } else {
+      // Si no tenemos day_order, usar 1 por defecto
+      logData.day_order = 1;
+      console.warn('⚠️ No day_order provided, using default: 1');
+    }
+
+    this.trackingService.createWorkoutLog(logData).subscribe({
       next: (log) => {
-        console.log('Created new workout log:', log.id);
+        console.log('✅ Created new workout log:', log);
         this.workoutLogId = log.id;
       },
       error: (err) => {
-        console.error('Error creating workout log:', err);
+        console.error('❌ Error creating workout log:', err);
         
         // Si el error es de duplicado, intentar obtener el existente
         if (err.status === 500 && err.error?.includes?.('duplicate')) {
@@ -171,18 +205,20 @@ export class DoWorkoutComponent implements OnInit {
     
     this.trackingService.getWorkoutLogs({ date: today }).subscribe({
       next: (logs) => {
+        // ✅ CAMBIO: Buscar por workout_day_id Y day_order
         const existingLog = logs.find(log => 
-          log.workout_day_name === this.workoutDay?.name
+          log.workout_day === this.workoutDay?.id &&
+          (this.dayOrder ? log.day_order === this.dayOrder : true)
         );
         
         if (existingLog) {
-          console.log('Found existing log after error:', existingLog.id);
+          console.log('✅ Found existing log after error:', existingLog.id);
           this.workoutLogId = existingLog.id;
           this.loadExistingSets(existingLog.id);
         }
       },
       error: (err) => {
-        console.error('Error finding existing log:', err);
+        console.error('❌ Error finding existing log:', err);
       }
     });
   }
@@ -190,7 +226,7 @@ export class DoWorkoutComponent implements OnInit {
   private loadExistingSets(workoutLogId: number): void {
     this.trackingService.getWorkoutLog(workoutLogId).subscribe({
       next: (log) => {
-        console.log('Loading existing sets:', log.set_logs);
+        console.log('📥 Loading existing sets:', log.set_logs);
         
         // Agrupar sets por ejercicio para determinar cuáles están completos
         const setsByExercise = new Map<number, any[]>();
@@ -240,7 +276,7 @@ export class DoWorkoutComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error('Error loading sets:', err);
+        console.error('❌ Error loading sets:', err);
       }
     });
   }
@@ -324,7 +360,7 @@ export class DoWorkoutComponent implements OnInit {
         this.cdr.markForCheck();
       })
       .catch((err) => {
-        console.error('Error saving sets:', err);
+        console.error('❌ Error saving sets:', err);
         this.saving = false;
         this.snackBar.open('Error saving exercise', 'Close', { duration: 3000 });
         this.cdr.markForCheck();
@@ -387,6 +423,7 @@ export class DoWorkoutComponent implements OnInit {
         // Marcar como completado
         this.trackingService.markWorkoutCompleted(this.workoutLogId!).subscribe({
           next: () => {
+            console.log('✅ Workout completado exitosamente');
             this.snackBar.open('Workout completed! 🎉', 'Close', { duration: 3000 });
             this.router.navigate(['/user/workouts']);
           },

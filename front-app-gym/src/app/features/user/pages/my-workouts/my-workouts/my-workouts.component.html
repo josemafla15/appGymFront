@@ -29,7 +29,11 @@
               <mat-icon [class.completed-icon]="status.isCompletedToday">
                 {{ status.isCompletedToday ? 'check_circle' : getWorkoutIcon(status.day) }}
               </mat-icon>
-              <h3>{{ status.day.name }}</h3>
+              <!-- ✅ CAMBIO: Agregar número de día -->
+              <h3>
+                <span class="day-number">Day {{ status.dayOrder }}:</span>
+                {{ status.day.name }}
+              </h3>
             </div>
             <mat-chip 
               *ngIf="status.isCompletedToday"
@@ -54,22 +58,22 @@
         </mat-card-content>
 
         <mat-card-actions>
-          <!-- Mostrar Start Workout solo si NO está completado -->
+          <!-- ✅ CAMBIO CRÍTICO: Pasar dayOrder como segundo parámetro -->
           <button 
             *ngIf="!status.isCompletedToday"
             mat-raised-button 
             color="primary"
-            (click)="onStartWorkout(status.day.id)">
+            (click)="onStartWorkout(status.day.id, status.dayOrder)">
             <mat-icon>play_arrow</mat-icon>
             Start Workout
           </button>
 
-          <!-- Mostrar View Details si está completado -->
+          <!-- ✅ CAMBIO CRÍTICO: Pasar dayOrder como segundo parámetro -->
           <button 
             *ngIf="status.isCompletedToday"
             mat-stroked-button 
             color="primary"
-            (click)="onViewWorkout(status.day.id)">
+            (click)="onViewWorkout(status.day.id, status.dayOrder)">
             <mat-icon>visibility</mat-icon>
             View Details
           </button>
