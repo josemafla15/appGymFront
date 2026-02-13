@@ -330,7 +330,7 @@ export class DoWorkoutComponent implements OnInit {
       const weight = setControl.get('weight')?.value;
 
       const promise = this.trackingService.addSetToWorkout(this.workoutLogId, {
-        exercise_id: exerciseId,
+        exercise: exerciseId,
         set_number: setIndex + 1,
         reps: reps,
         weight: weight || undefined

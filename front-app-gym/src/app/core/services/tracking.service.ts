@@ -1,3 +1,11 @@
+// ============================================================================
+// CORRECCIÓN PARA EL FRONTEND - tracking.service.ts
+// ============================================================================
+// Archivo: front-app-gym/src/app/core/services/tracking.service.ts
+//
+// ✅ FIX: Cambiar URL de 'add_set' a 'add-set'
+// ============================================================================
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -57,16 +65,18 @@ export class TrackingService {
     return this.http.delete<void>(`${this.API_URL}/workouts/${id}/`);
   }
 
+  // ✅ FIX CRÍTICO: Cambiar 'add_set' por 'add-set'
   addSetToWorkout(workoutLogId: number, setLog: SetLogCreate): Observable<SetLog> {
     return this.http.post<SetLog>(
-      `${this.API_URL}/workouts/${workoutLogId}/add_set/`,
+      `${this.API_URL}/workouts/${workoutLogId}/add-set/`,  // ← CAMBIO AQUÍ
       setLog
     );
   }
 
+  // ✅ También corregir esta URL
   markWorkoutCompleted(workoutLogId: number): Observable<any> {
     return this.http.patch(
-      `${this.API_URL}/workouts/${workoutLogId}/mark_completed/`,
+      `${this.API_URL}/workouts/${workoutLogId}/mark-completed/`,  // ← CAMBIO AQUÍ
       {}
     );
   }
@@ -104,3 +114,24 @@ export class TrackingService {
     return this.http.delete<void>(`${this.API_URL}/sets/${id}/`);
   }
 }
+
+
+// ============================================================================
+// RESUMEN DE CAMBIOS
+// ============================================================================
+// 
+// CAMBIOS REALIZADOS:
+// 1. Línea ~52: addSetToWorkout()
+//    - ANTES: `${this.API_URL}/workouts/${workoutLogId}/add_set/`
+//    - AHORA:  `${this.API_URL}/workouts/${workoutLogId}/add-set/`
+//
+// 2. Línea ~59: markWorkoutCompleted()
+//    - ANTES: `${this.API_URL}/workouts/${workoutLogId}/mark_completed/`
+//    - AHORA:  `${this.API_URL}/workouts/${workoutLogId}/mark-completed/`
+//
+// RAZÓN DEL CAMBIO:
+// Django REST Framework usa guiones (-) en las URLs por defecto cuando se
+// define un @action con url_path. El frontend estaba usando underscores (_)
+// lo que causaba errores 404.
+//
+// ============================================================================

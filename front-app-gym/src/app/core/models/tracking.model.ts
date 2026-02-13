@@ -12,7 +12,7 @@ export interface SetLog {
 }
 
 export interface SetLogCreate {
-  exercise_id: number;
+  exercise: number;
   set_number: number;
   reps: number;
   weight?: number;
